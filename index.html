@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-group .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .form-group .btn:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        .results h2 {
+            margin-top: 0;
+        }
+        .scan-result {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Port Scanner</h1>
+        <div class="form-group">
+            <label for="url">Enter URL:</label>
+            <input type="text" id="url" name="url" placeholder="Example: gces.edu.np">
+            <button onclick="scanPorts()" class="btn">Scan Ports</button>
+        </div>
+        <div class="results" id="scanResults">
+            <h2>Scan Results:</h2>
+            <div id="resultsList"></div>
+        </div>
+    </div>
+
+    <script>
+        function scanPorts() {
+            var url = document.getElementById('url').value.trim();
+            if (url === '') {
+                alert('Please enter a URL.');
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/scan?url=' + encodeURIComponent(url), true);
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    var response = JSON.parse(xhr.responseText);
+                    displayResults(response);
+                } else {
+                    alert('Failed to scan ports.');
+                }
+            };
+
+            xhr.onerror = function() {
+                alert('Failed to scan ports.');
+            };
+
+            xhr.send();
+        }
+
+        function displayResults(results) {
+            var resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+            results.forEach(function(result) {
+                var resultElem = document.createElement('div');
+                resultElem.classList.add('scan-result');
+                resultElem.innerHTML = '<strong>Port ' + result.port + ': </strong>' + result.status;
+                resultsList.appendChild(resultElem);
+            });
+        }
+    </script>
+</body>
+</html>
+
